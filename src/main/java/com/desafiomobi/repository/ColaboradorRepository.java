@@ -11,7 +11,7 @@ import com.desafiomobi.domain.Setor;
 @Repository
 public interface ColaboradorRepository extends PagingAndSortingRepository<Colaborador, Long> {
 
-	Colaborador findByNome(String nome);
+	Page<Colaborador> findByNome(String nome, Pageable pageable);
 	
 	Page<Colaborador> findAllBySetor(Setor setor, Pageable pageable);
 }

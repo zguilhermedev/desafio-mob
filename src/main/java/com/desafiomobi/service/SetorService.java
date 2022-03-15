@@ -15,4 +15,8 @@ public class SetorService {
 	public Setor findById(Long id) {
 		return this.setorRepository.findById(id).get();
 	}
+	
+	public Setor findByDescricao(String descricao) {
+		return this.setorRepository.findByDescricao(descricao).get(0);
+	}
 }

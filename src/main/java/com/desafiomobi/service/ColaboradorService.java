@@ -1,10 +1,7 @@
 package com.desafiomobi.service;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -17,44 +14,80 @@ public class ColaboradorService {
 
 	@Autowired
 	ColaboradorRepository repository;
-	
+
 	@Autowired
 	SetorService setorService;
 	
-	public Page<Colaborador> findAll(Map<String, String> filters){
-		
-		int page = filters.get("page") != null ? Integer.valueOf(filters.get("page")) : 0;
-		int size = filters.get("size") != null ? Integer.valueOf(filters.get("size")) : 10;
-		
-		Pageable pageable = PageRequest.of(page, size);
-		
+	@Autowired
+	BlackListService blackListService;
+
+	public Page<Colaborador> findAll(Pageable pageable) {
 		return this.repository.findAll(pageable);
 	}
-	
-	public Colaborador save(Colaborador colaborador) {
-		return this.repository.save(colaborador);
-	}
-	
-	public void delete(Long id) {
-		this.repository.deleteById(id);
-	}
-	
-	public Colaborador findById(Long id) {
-		return this.repository.findById(id).get();
-	}
-	
-	public Colaborador findByNome(String nome) {
-		return this.repository.findByNome(nome);
-	}
-	
-	public Page<Colaborador> findBySetor(Map<String, String> filters) {
+
+	public Colaborador save(Colaborador colaborador) throws RuntimeException {
 		
-		int page = filters.get("page") != null ? Integer.valueOf(filters.get("page")) : 0;
-		int size = filters.get("size") != null ? Integer.valueOf(filters.get("size")) : 10;
-		Long setorId = filters.get("setorId") != null ? Long.valueOf(filters.get("setorId")) : null;
-		Pageable pageable = PageRequest.of(page, size);
-		Setor setor = this.setorService.findById(setorId);
+		if(validateBlackList(colaborador.getCpf())) {
+			throw new RuntimeException("Colaborador não pode ser inserido pois está na lista negra.");
+		}
+		
+		try {
+			return this.repository.save(colaborador);
+		} catch (RuntimeException e) {
+			throw new RuntimeException("Erro ao inserir colaborador");
+		}
+	}
+
+	public void delete(Long id) throws RuntimeException {
+		try {
+			this.repository.deleteById(id);
+		} catch (RuntimeException e) {
+			throw new RuntimeException("Erro ao deletar colaborador");
+		}
+	}
+
+	public Colaborador findById(Long id) throws RuntimeException {
+		Colaborador colaborador = this.repository.findById(id).orElse(null);
+
+		if (colaborador == null) {
+			throw new RuntimeException("Colaborador não encontrado");
+		}
+
+		return colaborador;
+	}
+
+	public Page<Colaborador> findByNome(String nome, Pageable pageable) {
+		Page<Colaborador> page = this.repository.findByNome(nome, pageable);
+
+		if (page.getContent().isEmpty()) {
+			throw new RuntimeException("Colaborador não encontrado");
+		}
+
+		return page;
+	}
+
+	public Page<Colaborador> findBySetor(String descricaoSetor, Pageable pageable) {
+		Setor setor = this.setorService.findByDescricao(descricaoSetor);
+
+		if (setor == null) {
+			throw new RuntimeException("Setor não encontrado");
+		}
+
 		return this.repository.findAllBySetor(setor, pageable);
 	}
-	
+
+	private boolean validateBlackList(String cpf) {
+		return blackListService.validateIfColaboradorIsInBlackList(cpf);
+	}
+
+	private boolean validateQuantidadeMenores18AnosPorSetor(Setor setor) {
+
+		return false;
+	}
+
+	private boolean validateQuantidadeMaiores65AnosPorSetor(Setor setor) {
+
+		return false;
+	}
+
 }
