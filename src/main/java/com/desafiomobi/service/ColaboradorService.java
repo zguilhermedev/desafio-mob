@@ -27,9 +27,10 @@ public class ColaboradorService {
 
 	public Colaborador save(Colaborador colaborador) throws RuntimeException {
 		
-		if(validateBlackList(colaborador.getCpf())) {
-			throw new RuntimeException("Colaborador não pode ser inserido pois está na lista negra.");
-		}
+		validateColaborador(colaborador);
+		validateBlackList(colaborador.getCpf());
+		validateQuantidadeMaiores65Anos();
+		validateQuantidadeMenores18AnosPorSetor(colaborador.getSetor());
 		
 		try {
 			return this.repository.save(colaborador);
@@ -75,19 +76,52 @@ public class ColaboradorService {
 
 		return this.repository.findAllBySetor(setor, pageable);
 	}
-
-	private boolean validateBlackList(String cpf) {
-		return blackListService.validateIfColaboradorIsInBlackList(cpf);
+	
+	private void validateColaborador(Colaborador colaborador) throws RuntimeException {
+		if(colaborador.getSetor() == null) {
+			throw new RuntimeException("Setor é obrigatório");
+		}
+		
+		if(colaborador.getCpf() == null) {
+			throw new RuntimeException("Cpf é obrigatório");
+		}
+		
+		if(colaborador.getEmail() == null) {
+			throw new RuntimeException("Email é obrigatório");
+		}
+		
+		if(colaborador.getNome() == null) {
+			throw new RuntimeException("Nome é obrigatório");
+		}
+		
+		if(colaborador.getTelefone() == null) {
+			throw new RuntimeException("Telefone é obrigatório");
+		}
+		
+		if(colaborador.getDataNascimento() == null) {
+			throw new RuntimeException("Data de nascimento é obrigatório");
+		}
 	}
 
-	private boolean validateQuantidadeMenores18AnosPorSetor(Setor setor) {
-
-		return false;
+	private void validateBlackList(String cpf) throws RuntimeException {
+		if(blackListService.validateIfColaboradorIsInBlackList(cpf)) {
+			throw new RuntimeException("Colaborador não pode ser inserido pois está na lista negra.");
+		}
 	}
 
-	private boolean validateQuantidadeMaiores65AnosPorSetor(Setor setor) {
+	private void validateQuantidadeMenores18AnosPorSetor(Setor setor) throws RuntimeException {
 
-		return false;
+		if(!repository.validarColaboradoresComIdadeMenorQue18AnosPorSetor(setor.getId())) {
+			throw new RuntimeException("Não é possivel cadastrar colaborador nesse setor pois o setor já tem 20% de seus colaboradores com idade menor que 18 anos");
+		}
+		
+	}
+
+	private void validateQuantidadeMaiores65Anos() throws RuntimeException {
+
+		if(!repository.validarColaboradoresComIdadeMaiorQue65Anos()) {
+			throw new RuntimeException("Não é possivel cadastrar colaborador pois a empresa já tem 20% de seus colaboradores com idade maior que 65 anos");
+		}
 	}
 
 }

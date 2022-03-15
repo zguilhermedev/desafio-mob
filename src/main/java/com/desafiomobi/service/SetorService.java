@@ -17,6 +17,6 @@ public class SetorService {
 	}
 	
 	public Setor findByDescricao(String descricao) {
-		return this.setorRepository.findByDescricao(descricao).get(0);
+		return this.setorRepository.findByDescricao(descricao);
 	}
 }
