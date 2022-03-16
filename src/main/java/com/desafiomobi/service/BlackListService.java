@@ -1,5 +1,7 @@
 package com.desafiomobi.service;
 
+import static java.util.Objects.nonNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,12 +37,7 @@ public class BlackListService {
 	
 	public boolean validateIfColaboradorIsInBlackList(String cpf) {
 		ColaboradorBlackListDTO colaborador = findColaboradorInTheBlackListByCpf(cpf);
-		
-		if(colaborador != null ) {
-			return true;
-		}
-		
-		return false;
+		return nonNull(colaborador);
 	}
 
 }
