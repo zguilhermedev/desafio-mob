@@ -1,0 +1,49 @@
+version: '3.4''
+
+services:
+  desafio-mobi:
+    restart: always
+    image: docker.io/zguilhermedev/desafio-mobi:0.0.1-SNAPSHOT
+    ports: 
+      - 8080:8080
+    networks:
+      - desafio-network
+    depends_on:
+      - postgres
+    environment:
+      SPRING.DATASOURCE.URL: jdbc:postgresql://localhost:5432/desafio_db
+      SPRING.DATASOURCE.USERNAME: postgres
+      SPRING.DATASOURCE.PASSWORD: password
+      SPRING.DATASOURCE.DRIVER-CLASS-NAME: org.postgresql.Driver
+      SPRING.FLYWAY.BASELINEONMIGRATE: true
+      SPRING.FLYWAY.TABLE: version
+      SPRING.FLYWAY.SQLMIGRATIONPREFIX: V
+      SPRING.FLYWAY.SQLMIGRATIONSEPARATOR: _
+      SPRING.FLYWAY.ENCODING: UTF-8
+      SPRING.FLYWAY.VALIDATEONMIGRATE: true
+      SPRING.FLYWAY.SCHEMAS: public
+      SPRING.FLYWAY.LOCATIONS: classpath:db/migration
+  postgres:
+    container_name: desafio-db
+    image: "postgres:12.9"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DATABASE: desafio_db
+      PGDATA: /data/postgres
+      APP_DB_USER: docker
+      APP_DB_PASS: docker
+      APP_DB_NAME: docker
+    volumes:
+       - postgres:/data/postgres
+       - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+    ports:
+      - 15432:5432
+    expose:
+      - 5432
+    restart: unless-stopped
+    networks:
+      - desafio-network
+networks:
+  desafio-network:
+    driver: bridge

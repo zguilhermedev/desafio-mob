@@ -62,11 +62,17 @@
         </dependency>
 
 		<dependency>
-		    <groupId>junit</groupId>
-		    <artifactId>junit</artifactId>
-		    <version>4.13.2</version>
+		   	<groupId>org.junit.jupiter</groupId>
+    		<artifactId>junit-jupiter-engine</artifactId>
 		    <scope>test</scope>
 		</dependency>
+		
+		<dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+		
+		
 	</dependencies>
 
 	<build>
@@ -81,7 +87,24 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+					<image>
+						<name>zguilhermedev/${project.artifactId}:${project.version}</name>
+					</image>
+					<pullPolicy>IF_NOT_PRESENT</pullPolicy>
 				</configuration>
+			</plugin>
+			<plugin>
+			    <groupId>org.flywaydb</groupId>
+			    <artifactId>flyway-maven-plugin</artifactId>
+			    <configuration>
+			    	<locations>
+			    		<location>classpath:db/migration/</location>
+			    	</locations>
+			    	<table>versions</table>
+	                <url>jdbc:postgresql://postgres/desafio_db</url>
+	                <user>postgres</user>
+	                <password>password</password>
+	            </configuration>
 			</plugin>
 		</plugins>
 	</build>

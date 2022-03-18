@@ -2,7 +2,6 @@ package com.desafiomobi.service;
 
 import static com.desafiomobi.util.MensagemUtil.MS001_COLABORADOR_NAO_ENCONTRADO;
 import static com.desafiomobi.util.MensagemUtil.MS002_SETOR_NAO_ENCONTRADO;
-import static com.desafiomobi.util.MensagemUtil.MS003_SETOR_OBRIGATORIO;
 import static com.desafiomobi.util.MensagemUtil.MS004_CPF_OBRIGATORIO;
 import static com.desafiomobi.util.MensagemUtil.MS005_EMAIL_OBRIGATORIO;
 import static com.desafiomobi.util.MensagemUtil.MS006_NOME_OBRIGATORIO;
@@ -82,7 +81,7 @@ public class ColaboradorService {
 	}
 	
 	private void validateSaveColaborador(Colaborador colaborador) throws RuntimeException {
-		ofNullable(colaborador.getSetor()).orElseThrow(() -> new RuntimeException(MS003_SETOR_OBRIGATORIO));
+//		ofNullable(colaborador.getSetor()).orElseThrow(() -> new RuntimeException(MS003_SETOR_OBRIGATORIO));
 		ofNullable(colaborador.getCpf()).orElseThrow(() -> new RuntimeException(MS004_CPF_OBRIGATORIO));
 		ofNullable(colaborador.getEmail()).orElseThrow(() -> new RuntimeException(MS005_EMAIL_OBRIGATORIO));		
 		ofNullable(colaborador.getNome()).orElseThrow(() -> new RuntimeException(MS006_NOME_OBRIGATORIO));	
